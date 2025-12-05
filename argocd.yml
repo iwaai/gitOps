@@ -1,0 +1,18 @@
+apiVersion: argoproj.io/v1alpha1
+kind: Application
+metadata:
+  name: qb-cluster
+  namespace: argocd
+spec:
+  project: default
+  source:
+    repoURL: 'https://github.com/iwaai/gitOps'
+    targetRevision: main
+    path: '.'
+  destination:
+    server: 'https://kubernetes.default.svc'
+    namespace: ''    # Namespace to deploy resources
+  syncPolicy:
+    automated:            # Optional: auto-sync
+      prune: true         # Delete resources removed from git
+      selfHeal: true      # Fix drift automatically
