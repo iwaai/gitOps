@@ -1,0 +1,27 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: call-center-api
+  namespace: backend
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: call-center-api
+  template:
+    metadata:
+      labels:
+        app: call-center-api
+    spec:
+      containers:
+        - name: nodejs-app
+          image: 692859934069.dkr.ecr.ap-south-1.amazonaws.com/callcenterapp:latest
+          ports:
+            - containerPort: 4000
+          resources:
+            requests:
+              memory: "512Mi"
+              cpu: "250m"
+            limits:
+              memory: "1Gi"
+              cpu: "500m"
