@@ -11,7 +11,7 @@ spec:
     path: '.'
   destination:
     server: 'https://kubernetes.default.svc'
-    namespace: ''    # Namespace to deploy resources
+    namespace: backend    # Namespace to deploy resources
   syncPolicy:
     automated:            # Optional: auto-sync
       prune: true         # Delete resources removed from git
