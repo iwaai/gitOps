@@ -15,7 +15,7 @@ spec:
     spec:
       containers:
         - name: nodejs-app
-          image: 692859934069.dkr.ecr.ap-south-1.amazonaws.com/callcenterapp:latest
+          image: 692859934069.dkr.ecr.ap-south-1.amazonaws.com/callcenterapp:7272d0f942452d6b7ab316a79596ad6fcb3d8cac
           ports:
             - containerPort: 4000
           resources:
