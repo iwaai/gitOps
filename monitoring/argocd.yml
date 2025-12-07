@@ -1,0 +1,19 @@
+kind: Application
+metadata:
+  name: monitoring
+  namespace: argocd
+spec:
+  project: default
+  source:
+    repoURL: 'https://github.com/iwaai/gitOps'
+    targetRevision: main
+    path: 'monitoring'    # Path to prometheus/grafana manifests
+  destination:
+    server: 'https://kubernetes.default.svc'
+    namespace: monitoring
+  syncPolicy:
+    automated:
+      prune: true
+      selfHeal: true
+    syncOptions:
+      - CreateNamespace=true
