@@ -1,0 +1,34 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: grafana-dashboards
+  namespace: monitoring
+data:
+  pod-metrics.json: |
+    {
+      "dashboard": {
+        "title": "Pod Resource Usage",
+        "panels": [
+          {
+            "type": "graph",
+            "title": "CPU Usage per Pod",
+            "targets": [
+              {
+                "expr": "sum(rate(container_cpu_usage_seconds_total{image!=\"\",namespace!=\"kube-system\"}[5m])) by (pod)",
+                "legendFormat": "{{pod}}"
+              }
+            ]
+          },
+          {
+            "type": "graph",
+            "title": "Memory Usage per Pod",
+            "targets": [
+              {
+                "expr": "sum(container_memory_usage_bytes{image!=\"\",namespace!=\"kube-system\"}) by (pod)",
+                "legendFormat": "{{pod}}"
+              }
+            ]
+          }
+        ]
+      }
+    }
