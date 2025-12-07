@@ -7,8 +7,42 @@ data:
   prometheus.yml: |
     global:
       scrape_interval: 15s
-
+      scrape_timeout: 10s
+      evaluation_interval: 15s
+    
     scrape_configs:
+      # Call Center API - Using Kubernetes Service Discovery
       - job_name: 'call-center-api'
+        metrics_path: '/metrics'
+        kubernetes_sd_configs:
+          - role: endpoints
+            namespaces:
+              names:
+                - backend
+        relabel_configs:
+          # Only scrape call-center-service
+          - source_labels: [__meta_kubernetes_service_name]
+            action: keep
+            regex: call-center-service
+          
+          # Use the actual pod port (4000), not service port
+          - source_labels: [__meta_kubernetes_endpoint_address_target_name, __meta_kubernetes_endpoint_port_name]
+            action: keep
+            regex: .*;http
+          
+          # Add useful labels
+          - source_labels: [__meta_kubernetes_namespace]
+            target_label: kubernetes_namespace
+          - source_labels: [__meta_kubernetes_service_name]
+            target_label: kubernetes_service_name
+          - source_labels: [__meta_kubernetes_pod_name]
+            target_label: kubernetes_pod_name
+      
+      # OR use static config with the actual endpoint IP:PORT
+      - job_name: 'call-center-api-static'
+        metrics_path: '/metrics'
         static_configs:
-          - targets: ['call-center-service.backend.svc.cluster.local:8080']
+          - targets: ['10.0.4.82:4000']  # Direct pod IP and port
+            labels:
+              service: 'call-center-api'
+              namespace: 'backend'
