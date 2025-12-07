@@ -4,7 +4,7 @@ metadata:
   name: call-center-api
   namespace: backend
 spec:
-  replicas: 5
+  replicas: 1
   selector:
     matchLabels:
       app: call-center-api
