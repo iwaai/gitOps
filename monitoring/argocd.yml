@@ -8,7 +8,7 @@ spec:
   source:
     repoURL: 'https://github.com/iwaai/gitOps'
     targetRevision: main
-    path: 'monitoring'    # Path to prometheus/grafana manifests
+    path: 'monitoring'
   destination:
     server: 'https://kubernetes.default.svc'
     namespace: monitoring
