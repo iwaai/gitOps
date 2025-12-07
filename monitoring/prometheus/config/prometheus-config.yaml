@@ -12,15 +12,17 @@ data:
         kubernetes_sd_configs:
           - role: pod
         relabel_configs:
-          - source_labels: [__meta_kubernetes_pod_annotation_prometheus_io_scrape]
-            action: keep
-            regex: true
-          - source_labels: [__meta_kubernetes_pod_annotation_prometheus_io_path]
-            action: replace
+          - action: keep
+            source_labels: [__meta_kubernetes_pod_annotation_prometheus_io_scrape]
+            regex: "true"
+
+          - action: replace
+            source_labels: [__meta_kubernetes_pod_annotation_prometheus_io_path]
             target_label: __metrics_path__
-            regex: (.+)
-          - source_labels: [__meta_kubernetes_pod_annotation_prometheus_io_port]
-            action: replace
+
+          - action: replace
+            source_labels: [__meta_kubernetes_pod_ip, __meta_kubernetes_pod_annotation_prometheus_io_port]
             target_label: __address__
-            regex: (.+)
-            replacement: $1
+            regex: (.+);(.+)
+            replacement: $1:$2
+
