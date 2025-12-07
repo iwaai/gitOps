@@ -1,8 +1,10 @@
 resources:
   - namespaces/monitoring-namespace.yaml
+  - grafana/grafana-ingress.yaml
   - grafana/dashboards/pod-metrics-configmap.yaml
   - grafana/deployment.yaml
   - grafana/service.yml
+  - prometheus/prometheus-ingress.yaml
   - prometheus/config/prometheus-config.yaml
   - prometheus/deployment.yaml
   - prometheus/service.yml
