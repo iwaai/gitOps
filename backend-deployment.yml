@@ -12,10 +12,10 @@ spec:
     metadata:
       labels:
         app: call-center-api
-      annotations:     # <- HERE is where Prometheus annotations go
+      annotations:
         prometheus.io/scrape: "true"
         prometheus.io/path: "/metrics"
-        prometheus.io/port: "8080"
+        prometheus.io/port: "4000"
     spec:
       containers:
         - name: nodejs-app
