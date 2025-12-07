@@ -3,6 +3,8 @@ kind: Service
 metadata:
   name: call-center-service
   namespace: backend
+  labels:
+    app: call-center-api
 spec:
   type: ClusterIP
   selector:
