@@ -1,0 +1,12 @@
+resources:
+  - namespaces/monitoring-namespace.yaml
+  - grafana/dashboards/pod-metrics-configmap.yaml
+  - grafana/deployment.yaml
+  - grafana/service.yml
+  - prometheus/config/prometheus-config.yaml
+  - prometheus/deployment.yaml
+  - prometheus/service.yml
+  - rbac/clusterrole-prometheus.yml
+  - rbac/clusterrolebinding-prometheus.yml
+  - rbac/grafana-sa.yaml
+  - rbac/prometheus-sa.yaml
