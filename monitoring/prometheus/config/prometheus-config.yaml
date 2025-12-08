@@ -9,40 +9,42 @@ data:
       scrape_interval: 15s
       scrape_timeout: 10s
       evaluation_interval: 15s
-    
     scrape_configs:
-      # Call Center API - Using Kubernetes Service Discovery
-      - job_name: 'call-center-api'
-        metrics_path: '/metrics'
-        kubernetes_sd_configs:
-          - role: endpoints
-            namespaces:
-              names:
-                - backend
-        relabel_configs:
-          # Only scrape call-center-service
-          - source_labels: [__meta_kubernetes_service_name]
-            action: keep
-            regex: call-center-service
-          
-          # Use the actual pod port (4000), not service port
-          - source_labels: [__meta_kubernetes_endpoint_address_target_name, __meta_kubernetes_endpoint_port_name]
-            action: keep
-            regex: .*;http
-          
-          # Add useful labels
-          - source_labels: [__meta_kubernetes_namespace]
-            target_label: kubernetes_namespace
-          - source_labels: [__meta_kubernetes_service_name]
-            target_label: kubernetes_service_name
-          - source_labels: [__meta_kubernetes_pod_name]
-            target_label: kubernetes_pod_name
-      
-      # OR use static config with the actual endpoint IP:PORT
-      - job_name: 'call-center-api-static'
-        metrics_path: '/metrics'
+      # ===== PROMETHEUS ITSELF =====
+      - job_name: 'prometheus'
         static_configs:
-          - targets: ['10.0.4.82:4000']  # Direct pod IP and port
-            labels:
-              service: 'call-center-api'
-              namespace: 'backend'
+          - targets: ['localhost:9090']
+
+      # ===== KUBERNETES NODE EXPORTER =====
+      - job_name: 'node-exporter'
+        static_configs:
+          - targets: ['node-exporter.monitoring.svc.cluster.local:9100']
+
+      # ===== KUBELET METRICS =====
+      - job_name: 'kubelet'
+        scheme: https
+        metrics_path: /metrics
+        tls_config:
+          insecure_skip_verify: true
+        bearer_token_file: /var/run/secrets/kubernetes.io/serviceaccount/token
+        kubernetes_sd_configs:
+          - role: node
+        relabel_configs:
+          - action: labelmap
+            regex: __meta_kubernetes_node_label_(.+)
+
+      # ===== SCRAPE ALL PODS THAT HAVE:  annotations prometheus.io/scrape="true" =====
+      - job_name: 'kubernetes-pods'
+        kubernetes_sd_configs:
+          - role: pod
+        relabel_configs:
+          - source_labels: [__meta_kubernetes_pod_annotation_prometheus_io_scrape]
+            action: keep
+            regex: "true"
+          - source_labels: [__meta_kubernetes_pod_ip]
+            action: replace
+            target_label: __address__
+            regex: (.*)
+            replacement: $1:80
+          - action: labelmap
+            regex: __meta_kubernetes_pod_label_(.+)
