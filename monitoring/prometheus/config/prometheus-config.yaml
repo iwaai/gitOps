@@ -7,33 +7,23 @@ data:
   prometheus.yml: |
     global:
       scrape_interval: 15s
-      scrape_timeout: 10s
       evaluation_interval: 15s
+
     scrape_configs:
-      # ===== PROMETHEUS ITSELF =====
+      # ------------------ PROMETHEUS ITSELF ------------------
       - job_name: 'prometheus'
         static_configs:
           - targets: ['localhost:9090']
 
-      # ===== KUBERNETES NODE EXPORTER =====
-      - job_name: 'node-exporter'
+      # ------------------ YOUR EC2 BACKEND ------------------
+      - job_name: 'backend'
         static_configs:
-          - targets: ['node-exporter.monitoring.svc.cluster.local:9100']
-
-      # ===== KUBELET METRICS =====
-      - job_name: 'kubelet'
-        scheme: https
-        metrics_path: /metrics
-        tls_config:
-          insecure_skip_verify: true
-        bearer_token_file: /var/run/secrets/kubernetes.io/serviceaccount/token
-        kubernetes_sd_configs:
-          - role: node
-        relabel_configs:
-          - action: labelmap
-            regex: __meta_kubernetes_node_label_(.+)
-
-      # ===== SCRAPE ALL PODS THAT HAVE:  annotations prometheus.io/scrape="true" =====
+          - targets:
+              - 'backend.backend.svc.cluster.local:80'
+            labels:
+              service: "backend-service"
+              env: "prod"
+      # ------------------ SCRAPE PODS IN KUBERNETES ------------------
       - job_name: 'kubernetes-pods'
         kubernetes_sd_configs:
           - role: pod
@@ -46,5 +36,3 @@ data:
             target_label: __address__
             regex: (.*)
             replacement: $1:80
-          - action: labelmap
-            regex: __meta_kubernetes_pod_label_(.+)
